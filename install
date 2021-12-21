@@ -1,0 +1,35 @@
+echo "==============="
+echo " Pi Essentials "
+echo "==============="
+
+echo "Installing Pi Apps"
+wget -qO- https://raw.githubusercontent.com/Botspot/pi-apps/master/install | bash
+
+echo "Installing Special Apps"
+sudo apt-get install vlc
+sudo apt-get install libreoffice
+#!/bin/bash
+if ! command -v libreoffice >/dev/null ;then
+  error "User error: Libreoffice is not installed, so this theme is useless to you.\nTo install libreoffice, run this in a terminal:\nsudo apt install libreoffice libreoffice-gtk2"
+fi
+
+rm -rf ~/libreoffice-ms-theme
+git_clone --depth=1 https://github.com/Botspot/libreoffice-ms-theme || error "Failed to git_clone libreoffice-ms-theme repository!"
+~/libreoffice-ms-theme/apply.sh || error "apply.sh failed"
+rm -rf ~/libreoffice-ms-theme
+#!/bin/bash
+if ! cat /proc/cpuinfo | grep Model | sed 's/Model.*: //g' | grep -q 'Raspberry Pi' ;then
+  error "User error: CommanderPi can only be installed on Raspberry Pi devices. Your device is: $(cat /proc/cpuinfo | grep Model | sed 's/Model.*: //g')"
+fi
+
+rm -rf ~/CommanderPi &>/dev/null || sudo rm -rf ~/CommanderPi || error "Failed to remove CommanderPi folder!"
+
+# Get dependencies
+install_packages python3-tk python3-pil python3-pil.imagetk || exit 1
+git_clone https://github.com/Jack477/CommanderPi || error "failed to download repository!"
+cd CommanderPi || error "failed to enter repository!"
+chmod +x install.sh || error "failed to mark install.sh as executable!"
+./install.sh || error "failed to run install.sh!"
+
+echo "Script has Finished. Apps Installed are: Pi-Apps Appstore, VLC Media Player, Libre Office, Microsoft Office Skin for Libre Office and Commander Pi."
+echo "Use Pi-Apps to install more apps."
